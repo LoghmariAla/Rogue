@@ -96,15 +96,17 @@ def list_processes():
                     
                     if pid not in existing_pids:
                         user = process.info['username'] if process.info['username'] else "N/A"
-                        cmdline = ' '.join(process.info['cmdline'])[:49]
+                        cmdline = process.info['cmdline']
                         
-                        if not cmdline:
-                            continue
+                        if cmdline and isinstance(cmdline, list) and cmdline:  
+                            cmdline_str = ' '.join(cmdline)[:49]
+                        else:
+                            continue 
                         
                         start_time = format_start_time(process.info['create_time'])
                         user_colored = color_user(user)
                         
-                        print(f"{start_time:<25} {pid:<10} {user_colored:<25} {cmdline:<50}")
+                        print(f"{start_time:<25} {pid:<10} {user_colored:<25} {cmdline_str:<50}")
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     pass
             
@@ -114,6 +116,7 @@ def list_processes():
     
     except KeyboardInterrupt:
         signal_handler(None, None)
+
 
 def main():
     signal.signal(signal.SIGINT, signal_handler)
